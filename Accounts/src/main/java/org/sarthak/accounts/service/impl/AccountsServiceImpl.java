@@ -46,7 +46,7 @@ public class AccountsServiceImpl  implements IAccountsService {
      */
     private Accounts createNewAccount(Customer customer) {
         Accounts newAccount = new Accounts();
-        newAccount.setCustomerId(customer.getCustomerId());
+        newAccount.setCustomer(customer);
         long randomAccNumber = 1000000000L + new Random().nextInt(900000000);
 
         newAccount.setAccountNumber(randomAccNumber);
@@ -64,7 +64,7 @@ public class AccountsServiceImpl  implements IAccountsService {
         Customer customer = customerRepository.findByMobileNumber(mobileNumber).orElseThrow(
                 () -> new ResourceNotFoundException("Customer", "mobileNumber", mobileNumber)
         );
-        Accounts accounts = accountsRepository.findByCustomerId(customer.getCustomerId()).orElseThrow(
+        Accounts accounts = accountsRepository.findByCustomer(customer).orElseThrow(
                 () -> new ResourceNotFoundException("Account", "customerId", customer.getCustomerId().toString())
         );
         CustomerDto customerDto = CustomerMapper.mapToCustomerDto(customer, new CustomerDto());
@@ -87,7 +87,7 @@ public class AccountsServiceImpl  implements IAccountsService {
             AccountsMapper.mapToAccounts(accountsDto, accounts);
             accounts = accountsRepository.save(accounts);
 
-            Long customerId = accounts.getCustomerId();
+            Long customerId = accounts.getCustomer().getCustomerId();
             Customer customer = customerRepository.findById(customerId).orElseThrow(
                     () -> new ResourceNotFoundException("Customer", "CustomerID", customerId.toString())
             );
@@ -107,7 +107,7 @@ public class AccountsServiceImpl  implements IAccountsService {
         Customer customer = customerRepository.findByMobileNumber(mobileNumber).orElseThrow(
                 () -> new ResourceNotFoundException("Customer", "mobileNumber", mobileNumber)
         );
-        accountsRepository.deleteByCustomerId(customer.getCustomerId());
+        accountsRepository.deleteByCustomer(customer);
         customerRepository.deleteById(customer.getCustomerId());
         return true;
     }

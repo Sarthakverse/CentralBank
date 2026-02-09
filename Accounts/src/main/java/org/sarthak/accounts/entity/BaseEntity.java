@@ -14,8 +14,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-@MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
+@MappedSuperclass // We use it so that the fields in this class can be inherited by other entity classes (like Customer and Accounts) without creating a separate table for BaseEntity in the database.
+@EntityListeners(AuditingEntityListener.class) // We use it to enable auditing features (like automatically setting createdAt, createdBy, updatedAt, updatedBy) for the entities that inherit from this class.
 @Getter
 @Setter
 @ToString

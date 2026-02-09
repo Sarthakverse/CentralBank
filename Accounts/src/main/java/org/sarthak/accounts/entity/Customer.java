@@ -3,6 +3,8 @@ package org.sarthak.accounts.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -22,5 +24,12 @@ public class Customer extends  BaseEntity {
 
     @Column(name="mobile_number")
     private String mobileNumber;
+
+    @OneToMany(
+            mappedBy = "customer",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY
+    )
+    private List<Accounts> accounts;
 
 }

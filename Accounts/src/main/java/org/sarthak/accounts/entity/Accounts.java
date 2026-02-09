@@ -11,12 +11,16 @@ import lombok.*;
 @NoArgsConstructor
 public class Accounts extends  BaseEntity {
 
-    @Column(name="customer_id")
-    private Long customerId;
+//    @Column(name="customer_id")
+//    private Long customerId;
 
-    @Column(name="account_number")
     @Id
+    @Column(name="account_number")
     private Long accountNumber;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 
     @Column(name="account_type")
     private String accountType;
