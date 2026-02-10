@@ -4,7 +4,7 @@ spring:
       on-profile: prod
 
   datasource:
-    url: jdbc:postgresql://localhost:41194/cards_prod_db
+    url: jdbc:postgresql://localhost:41194/accounts_prod_db
     username: ${DB_USERNAME:?Please set DB_USERNAME env variable}
     password: ${DB_PASSWORD:?Please set DB_PASSWORD env variable}
     driver-class-name: org.postgresql.Driver
@@ -12,14 +12,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-#      ddl-auto: validate //use this in prod to ensure schema is in place and not accidentally modified
     show-sql: false
 
 build:
   version: "PROD"
 
-cards:
-  message: "Welcome to CentralBank Cards APIs (Production)"
+accounts:
+  message: "Welcome to CentralBank Account APIs (Production)"
   contactDetails:
     name: "Reine Aishwarya - Product Owner"
     email: "aishwarya@centralbank.com"

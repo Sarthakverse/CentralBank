@@ -1,0 +1,11 @@
+build:
+  version: "LOCAL"
+
+loans:
+  message: "Welcome to CentralBank Loans APIs (Local)"
+  contactDetails:
+    name: "Dragos Lech - Developer"
+    email: "drago@centralbank.com"
+  onCallSupport:
+    - "(452) 456-2176"
+    - "(546) 764-8934"

@@ -7,6 +7,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="configServer" />
       </profile>
       <profile name="Annotation profile for Loan" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -16,16 +17,8 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
         <module name="Loan" />
-        <module name="Accounts" />
-      </profile>
-      <profile name="Annotation profile for Cards" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
-        </processorPath>
         <module name="Cards" />
+        <module name="Accounts" />
       </profile>
     </annotationProcessing>
   </component>
@@ -34,6 +27,7 @@
       <module name="Accounts" options="-parameters" />
       <module name="Cards" options="-parameters" />
       <module name="Loan" options="-parameters" />
+      <module name="configServer" options="-parameters" />
     </option>
   </component>
 </project>

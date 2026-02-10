@@ -12,7 +12,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-#      ddl-auto: validate //use this in prod to ensure schema is in place and not accidentally modified
+    #      ddl-auto: validate //use this in prod to ensure schema is in place and not accidentally modified
     show-sql: false
 
 build:

@@ -1,0 +1,11 @@
+build:
+  version: "LOCAL"
+
+cards:
+  message: "Welcome to CentralBank Cards APIs (Local)"
+  contactDetails:
+    name: "Amaal Grega - Developer"
+    email: "amaal@centralbank.com"
+  onCallSupport:
+    - "(452) 456-2176"
+    - "(546) 764-8934"
