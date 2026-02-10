@@ -1,7 +1,7 @@
 # version: "3.9" ....if we use this then mem_limit will not work because now docker says "mem limit is only for production level not self learning"
 services:
   accounts:
-    image: "centralbank/accounts-service:s1"
+    image: "centralbank/accounts-microservice:s1"
     container_name: accounts-ms
     ports:
       - "8080:8080"

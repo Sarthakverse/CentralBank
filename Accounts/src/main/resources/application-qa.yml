@@ -1,0 +1,19 @@
+spring:
+  config:
+    activate:
+      on-profile: qa
+
+  datasource:
+    url: jdbc:postgresql://localhost:41194/accounts_qa_db
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+build:
+  version: "QA"
+
+accounts:
+  message: "Welcome to CentralBank Accounts APIs (QA)"
+  contactDetails:
+    name: "Smitha Ray - QA Lead"
+    email: "smitha@centralbank.com"

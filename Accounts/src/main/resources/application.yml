@@ -1,16 +1,33 @@
 server:
   port: 8080
+
 spring:
+  application:
+    name: accounts-microservice
+
   datasource:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
     username: sa
-    password: ''
+    password: ""
+
   h2:
     console:
       enabled: true
+
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-        ddl-auto: update
+      ddl-auto: update
     show-sql: true
+
+build:
+  version: "LOCAL"
+
+accounts:
+  message: "Welcome to CentralBank Accounts APIs (Local)"
+  contactDetails:
+    name: "Local Dev Team"
+    email: "dev@centralbank.com"
+  onCallSupport:
+    - "(111) 111-1111"
+    - "(222) 222-2222"
