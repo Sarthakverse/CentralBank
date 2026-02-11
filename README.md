@@ -30,6 +30,7 @@ This project simulates a simplified banking ecosystem with independent domain-dr
 ---
 
 ## 🏗 Architecture Overview
+<img width="768" height="828" alt="Screenshot 2026-02-12 011149" src="https://github.com/user-attachments/assets/edffc420-3f4e-4a20-af51-1959a6a148da" />
 
 The system consists of the following microservices:
 
@@ -46,6 +47,9 @@ The system consists of the following microservices:
 ---
 
 ## 🧩 Microservices Breakdown
+**End-to-End Microservices Request Flow Sequence Diagram**
+<img width="1153" height="614" alt="Screenshot 2026-02-12 011248" src="https://github.com/user-attachments/assets/b1e4b905-d33f-4f40-b0a5-7c6ea5f0f3bb" />
+
 
 ### 🏦 Accounts Service
 Handles:
@@ -89,6 +93,9 @@ Handles:
 ---
 
 ### ⚙ Config Server
+**Centralized Configuration Management Architecture Diagram**
+<img width="1111" height="362" alt="Screenshot 2026-02-12 011319" src="https://github.com/user-attachments/assets/47cd4ca6-7fbf-45ba-8391-baf7a1606e40" />
+
 Centralized configuration source for:
 
 - accounts.yml
@@ -104,6 +111,9 @@ Supports profile-based segregation.
 ---
 
 ### 🌐 Eureka Server
+**Service Registration & Discovery Architecture Diagram**
+<img width="1229" height="502" alt="Screenshot 2026-02-12 011306" src="https://github.com/user-attachments/assets/20f36307-3d10-480b-9961-fcb2dd390d42" />
+
 Provides:
 - Service registration
 - Service discovery
@@ -155,6 +165,8 @@ Client → Gateway → Accounts → (Feign) → Loans & Cards
 ---
 
 ## 🔍 Distributed Request Tracing
+**Distributed co-relation id diagram**
+<img width="1134" height="593" alt="image" src="https://github.com/user-attachments/assets/856ddd2b-6f34-4e80-bd8e-a7e3ade479b0" />
 
 Gateway generates a unique: **centralbank-correlation-id**
 Flow:
