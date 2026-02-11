@@ -1,268 +1,287 @@
-<h1>CentralBank Microservices Platform</h1>
+<!-- README: SarthakVerse CentralBank Microservices Platform -->
 
-<p>
-This document provides a complete and formal description of the CentralBank
-microservices system. It covers system architecture, directory structure,
-service responsibilities, configuration strategy, environment behavior,
-database lifecycle management, and runtime execution.
-</p>
+<div align="center">
+  <h1>🏦 SarthakVerse — CentralBank Microservices Platform</h1>
+  <p>
+    <strong>Enterprise-Grade Distributed Banking Architecture</strong><br>
+    Built using Spring Boot • Spring Cloud • Eureka • Gateway • Docker
+  </p>
+  <hr width="60%">
+</div>
 
-<!-- ===================================================== -->
+---
 
-<h2>1. Project Overview</h2>
+## ✨ Overview
 
-<p>
-CentralBank is a Spring Boot–based microservices platform designed to model
-core banking domains using independent, isolated services. Each microservice
-is built, configured, and deployed independently.
-</p>
+**SarthakVerse CentralBank** is a cloud-native, distributed microservices banking platform built using modern Spring Boot and Spring Cloud technologies.
 
-<p>
-The project emphasizes production-safe practices such as environment-based
-configuration, strict database separation, and controlled schema management.
-</p>
+The system demonstrates production-grade architectural patterns including:
 
-<!-- ===================================================== -->
+- API Gateway Pattern  
+- Service Discovery (Eureka)  
+- Centralized Configuration (Config Server)  
+- Inter-Service Communication (Feign Clients)  
+- Distributed Request Tracing (Correlation ID)  
+- Dockerized Multi-Environment Deployment  
+- Profile-Based Configuration (default / qa / prod)
 
-<h2>2. Architectural Style</h2>
+This project simulates a simplified banking ecosystem with independent domain-driven services.
 
-<p>
-The system follows a <strong>microservices architecture</strong>.
-Each service is a standalone Spring Boot application with:
-</p>
+---
 
-<ul>
-    <li>its own codebase</li>
-    <li>its own configuration files</li>
-    <li>its own database per environment</li>
-    <li>its own runtime port</li>
-</ul>
+## 🏗 Architecture Overview
 
-<p>
-There is no shared database and no shared domain model between services.
-</p>
+The system consists of the following microservices:
 
-<!-- ===================================================== -->
+| Service | Port | Responsibility |
+|----------|------|---------------|
+| Config Server | 8071 | Centralized configuration management |
+| Eureka Server | 8072 | Service registry & discovery |
+| Gateway Server | 8081 | API routing, filters, tracing |
+| Accounts Service | 8080 | Customer & Account domain |
+| Loans Service | 8090 | Loan domain |
+| Cards Service | 9000 | Card domain |
+| RabbitMQ | 5672 | Messaging infrastructure |
 
-<h2>3. Complete Directory Structure</h2>
+---
 
-<pre>
-CentralBank/
+## 🧩 Microservices Breakdown
+
+### 🏦 Accounts Service
+Handles:
+- Customer creation
+- Account creation
+- Fetching customer composite details
+- Feign calls to Loans & Cards
+- DTO mapping
+- Exception handling
+- Auditing
+- Schema initialization
+
+Implements:
+- `CustomerController`
+- `AccountsController`
+- `CustomerServiceImpl`
+- Feign clients for Loans & Cards
+
+---
+
+### 💳 Cards Service
+Handles:
+- Card creation
+- Update
+- Delete
+- Fetch by mobile number
+- Profile-based configuration
+- Validation & exception handling
+
+---
+
+### 💰 Loans Service
+Handles:
+- Loan creation
+- Update
+- Delete
+- Fetch by mobile number
+- Contact info configuration
+- Audit logging
+
+---
+
+### ⚙ Config Server
+Centralized configuration source for:
+
+- accounts.yml
+- accounts-qa.yml
+- accounts-prod.yml
+- loans.yml
+- cards.yml
+- gatewayserver.yml
+- eurekaserver.yml
+
+Supports profile-based segregation.
+
+---
+
+### 🌐 Eureka Server
+Provides:
+- Service registration
+- Service discovery
+- Load-balanced communication
+- Health monitoring
+
+All microservices register themselves here.
+
+---
+
+### 🚪 Gateway Server
+
+Acts as system entry point.
+
+Features:
+- Load-balanced routing using `lb://`
+- Path rewriting
+- Global request filter
+- Global response filter
+- Correlation ID propagation
+- Response header injection
+- Dynamic route configuration using `RouteLocatorBuilder`
+
+Example routing:
+- `/centralbank/accounts/**`
+- `/centralbank/loans/**`
+- `/centralbank/cards/**`
+
+
+Implements:
+- RequestTraceFilter
+- ResponseTraceFilter
+- FilterUtility
+- Custom route configuration
+
+---
+
+## 🔁 Inter-Service Communication
+
+Accounts service uses:
+
+- `CardsFeignClient`
+- `LoansFeignClient`
+
+Communication flow:
+
+Client → Gateway → Accounts → (Feign) → Loans & Cards
+
+---
+
+## 🔍 Distributed Request Tracing
+
+Gateway generates a unique: **centralbank-correlation-id**
+Flow:
+1. If request already contains correlation ID → reused
+2. Else → generated at Gateway
+3. Propagated to downstream services
+4. Returned in response headers
+
+Ensures traceability across services.
+
+---
+## 🐳 Docker Deployment
+
+Project includes multi-environment docker setup:
+```
+docker-compose/
+├── default/
+├── qa/
+└── prod/
+```
+
+
+Each environment contains:
+- docker-compose.yml
+- common-config.yml
+
+Supports:
+- Profile activation
+- Network isolation
+- Service dependency sequencing
+- Environment variable injection
+
+---
+
+## 🚀 How To Run (Docker)
+
+Navigate to: **docker-compose/default**
+
+Then: **System startup order**
+1. RabbitMQ
+2. Config Server
+3. Eureka Server
+4. Accounts / Loans / Cards
+5. Gateway
+
+---
+
+## 🔎 Access Points
+
+| Component | URL |
+|-----------|------|
+| Gateway | http://localhost:8081 |
+| Eureka Dashboard | http://localhost:8072 |
+| Config Server | http://localhost:8071 |
+| Accounts API | http://localhost:8081/centralbank/accounts/... |
+
+---
+
+## 📂 Project Structure
+```
+sarthakverse-centralbank/
 ├── Accounts/
-│   ├── .mvn/
-│   ├── mvnw
-│   ├── mvnw.cmd
-│   ├── pom.xml
-│   └── src/
-│       ├── main/
-│       │   ├── java/
-│       │   │   └── org/sarthak/accounts/
-│       │   │       ├── AccountsApplication.java
-│       │   │       ├── controller/
-│       │   │       ├── service/
-│       │   │       ├── repository/
-│       │   │       ├── entity/
-│       │   │       ├── dto/
-│       │   │       └── constants/
-│       │   └── resources/
-│       │       ├── application.yml
-│       │       ├── application-qa.yml
-│       │       └── application-prod.yml
-│       └── test/
-│
 ├── Cards/
-│   ├── .mvn/
-│   ├── mvnw
-│   ├── mvnw.cmd
-│   ├── pom.xml
-│   └── src/
-│       ├── main/
-│       │   ├── java/
-│       │   │   └── org/sarthak/cards/
-│       │   │       ├── CardsApplication.java
-│       │   │       ├── controller/
-│       │   │       ├── service/
-│       │   │       ├── repository/
-│       │   │       ├── entity/
-│       │   │       └── dto/
-│       │   └── resources/
-│       │       ├── application.yml
-│       │       ├── application-qa.yml
-│       │       └── application-prod.yml
-│       └── test/
-│
-├── Loans/
-│   ├── .mvn/
-│   ├── mvnw
-│   ├── mvnw.cmd
-│   ├── pom.xml
-│   └── src/
-│       ├── main/
-│       │   ├── java/
-│       │   │   └── org/sarthak/loans/
-│       │   │       ├── LoansApplication.java
-│       │   │       ├── controller/
-│       │   │       ├── service/
-│       │   │       ├── repository/
-│       │   │       ├── entity/
-│       │   │       └── dto/
-│       │   └── resources/
-│       │       ├── application.yml
-│       │       ├── application-qa.yml
-│       │       └── application-prod.yml
-│       └── test/
-│
-├── docker-compose.yml
-└── README.md
-</pre>
+├── Loan/
+├── configServer/
+├── eurekaServer/
+├── gatewayserver/
+└── docker-compose/
+```
 
-<!-- ===================================================== -->
 
-<h2>4. Microservices Description</h2>
 
-<h3>4.1 Accounts Service</h3>
-<ul>
-    <li>Port: 8080</li>
-    <li>Configuration prefix: <code>accounts</code></li>
-    <li>Domain: Account management</li>
-</ul>
+Each service follows clean layered architecture:
 
-<h3>4.2 Cards Service</h3>
-<ul>
-    <li>Port: 9000</li>
-    <li>Configuration prefix: <code>cards</code></li>
-    <li>Domain: Card management</li>
-</ul>
+- controller
+- service
+- repository
+- dto
+- entity
+- mapper
+- exception
+- config
+- audit
 
-<h3>4.3 Loans Service</h3>
-<ul>
-    <li>Port: 8090</li>
-    <li>Configuration prefix: <code>loans</code></li>
-    <li>Domain: Loan management</li>
-</ul>
+---
 
-<!-- ===================================================== -->
+## 🧠 Architectural Concepts Implemented
 
-<h2>5. Internal Service Architecture</h2>
+- Microservices Architecture
+- Service Registry Pattern
+- API Gateway Pattern
+- Centralized Configuration Pattern
+- Circuit-ready design
+- DTO Mapping Layer
+- Exception Handling Strategy
+- Distributed Tracing (Manual)
+- Dockerized Environment Strategy
+- Environment-based Config Segregation
 
-<p>
-Each service follows a layered architecture:
-</p>
+---
 
-<pre>
-Controller → Service → Repository → Database
-</pre>
+## 🎯 Future Enhancements
 
-<ul>
-    <li><strong>Controller</strong>: REST endpoints</li>
-    <li><strong>Service</strong>: Business logic</li>
-    <li><strong>Repository</strong>: JPA data access</li>
-    <li><strong>Entity</strong>: Persistence models</li>
-    <li><strong>DTO</strong>: API request/response contracts</li>
-</ul>
+Planned roadmap:
 
-<!-- ===================================================== -->
+- JWT Authentication at Gateway
+- Resilience4j Circuit Breaker
+- Rate Limiting
+- Distributed Tracing with Zipkin
+- Centralized Logging (ELK Stack)
+- Prometheus & Grafana Monitoring
+- Kubernetes Deployment
+- CI/CD Integration
+- API Documentation Consolidation
 
-<h2>6. Environment and Profile Strategy</h2>
+---
 
-<table>
-    <tr>
-        <th>Environment</th>
-        <th>Profile</th>
-        <th>Database</th>
-        <th>ddl-auto</th>
-        <th>Purpose</th>
-    </tr>
-    <tr>
-        <td>Local</td>
-        <td>default</td>
-        <td>H2 (in-memory)</td>
-        <td>update</td>
-        <td>Developer productivity</td>
-    </tr>
-    <tr>
-        <td>QA</td>
-        <td>qa</td>
-        <td>PostgreSQL</td>
-        <td>update</td>
-        <td>Integration testing</td>
-    </tr>
-    <tr>
-        <td>Production</td>
-        <td>prod</td>
-        <td>PostgreSQL</td>
-        <td>validate</td>
-        <td>Schema safety</td>
-    </tr>
-</table>
+## 👨‍💻 Author
 
-<!-- ===================================================== -->
+**Sarthak Rastogi**
 
-<h2>7. Database Strategy</h2>
+Built as an enterprise-grade distributed system learning project to simulate real-world banking microservices architecture.
 
-<ul>
-    <li>Each service uses its own database per environment.</li>
-    <li>H2 is used only in local development.</li>
-    <li>PostgreSQL is used in QA and Production.</li>
-    <li>Hibernate schema creation is disabled in Production.</li>
-</ul>
+---
 
-<!-- ===================================================== -->
+<div align="center">
+  <strong>Engineered with precision. Designed for scale.</strong>
+</div>
 
-<h2>8. Environment Variables</h2>
 
-<p>
-The following environment variables are required for QA and Production:
-</p>
-
-<pre>
-DB_USERNAME
-DB_PASSWORD
-</pre>
-
-<!-- ===================================================== -->
-
-<h2>9. Running the Services</h2>
-
-<h3>9.1 Local (DEV)</h3>
-<pre>
-mvn spring-boot:run
-</pre>
-
-<h3>9.2 QA</h3>
-<pre>
-SPRING_PROFILES_ACTIVE=qa
-DB_USERNAME=postgres
-DB_PASSWORD=****
-</pre>
-
-<h3>9.3 Production</h3>
-<pre>
-SPRING_PROFILES_ACTIVE=prod
-DB_USERNAME=postgres
-DB_PASSWORD=****
-</pre>
-
-<!-- ===================================================== -->
-
-<h2>10. Explicit Non-Goals</h2>
-
-<ul>
-    <li>No API Gateway</li>
-    <li>No Service Discovery</li>
-    <li>No Inter-service communication</li>
-    <li>No Authentication or Authorization</li>
-</ul>
-
-<!-- ===================================================== -->
-
-<h2>11. Conclusion</h2>
-
-<p>
-CentralBank demonstrates a clean, production-aware microservices architecture
-with strict environment separation, independent services, and controlled
-database behavior suitable for enterprise-grade systems.
-</p>
-
-</body>
-</html>
