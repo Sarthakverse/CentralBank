@@ -1,0 +1,65 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: gatewayserver
+
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+#         enabled: true  .....when true, routes are automatically created for services registered in Eureka
+          enabled: false
+          lower-case-service-id: true
+
+#   we can define routes here if we don't want to use discovery locator & use custom routes instead using RouteLocatorBuilder
+#      routes:
+#        - id: accounts-route
+#          uri: lb://ACCOUNTS
+#          predicates:
+#            - Path=/accounts/**
+#          filters:
+#            - StripPrefix=1
+#
+#        - id: cards-route
+#          uri: lb://CARDS
+#          predicates:
+#            - Path=/cards/**
+#          filters:
+#            - StripPrefix=1
+#
+#        - id: loans-route
+#          uri: lb://LOANS
+#          predicates:
+#            - Path=/loans/**
+#          filters:
+#            - StripPrefix=1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    gateway:
+      access: unrestricted
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: "gatewayserver"
+    description: "Central Bank Gateway Server"
+    version: "1.0.0"
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG
+    feign: DEBUG
+

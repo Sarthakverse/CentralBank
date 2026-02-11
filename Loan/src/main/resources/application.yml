@@ -38,6 +38,9 @@ management:
   endpoint:
     shutdown:
       access: unrestricted
+    health:
+      probes:
+        enabled: true
   info:
     env:
       enabled: true
@@ -56,3 +59,9 @@ info:
     name: "loans"
     description: "Central Bank Loans Application"
     version: "1.0.0"
+
+logging:
+  level:
+    org.springframework.cloud.openfeign: DEBUG
+    com.netflix.discovery: INFO
+    org.springframework.web: INFO

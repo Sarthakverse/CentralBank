@@ -41,3 +41,6 @@ management:
       probes:
         enabled: true
 
+logging:
+  level:
+    org.springframework.cloud.config: DEBUG
