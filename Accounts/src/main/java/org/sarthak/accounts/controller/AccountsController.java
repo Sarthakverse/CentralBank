@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.sarthak.accounts.constants.AccountsConstants;
 import org.sarthak.accounts.dto.AccountsContactInfoDto;
@@ -36,21 +35,16 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(path="/api", produces = {MediaType.APPLICATION_JSON_VALUE})
 @Validated
+@RequiredArgsConstructor
 public class AccountsController {
     private final IAccountsService iAccountsService;
-
-    public AccountsController(IAccountsService iAccountsService) {
-        this.iAccountsService = iAccountsService;
-    }
 
     @Value("${build.version}")
     private String buildVersion;
 
-    @Autowired
-    private Environment environment;
+    private final Environment environment;
 
-    @Autowired
-    private AccountsContactInfoDto accountsContactInfoDto;
+    private final AccountsContactInfoDto accountsContactInfoDto;
 
     @Operation(
             summary = "Create Account REST API",

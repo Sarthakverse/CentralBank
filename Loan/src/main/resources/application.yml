@@ -25,13 +25,34 @@ spring:
 
   rabbitmq:
     host: localhost
-#    host : rabbit
+#   host : rabbit
     port: 5672
     username: guest
     password: guest
 
-  management:
-    endpoints:
-      web:
-        exposure:
-          include: "*"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      access: unrestricted
+  info:
+    env:
+      enabled: true
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8072/eureka/
+
+info:
+  app:
+    name: "loans"
+    description: "Central Bank Loans Application"
+    version: "1.0.0"

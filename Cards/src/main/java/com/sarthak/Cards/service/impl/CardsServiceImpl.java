@@ -10,16 +10,17 @@ import com.sarthak.Cards.mapper.CardsMapper;
 import com.sarthak.Cards.repository.CardsRepository;
 import com.sarthak.Cards.service.ICardsService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.Random;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CardsServiceImpl implements ICardsService {
 
-    private CardsRepository cardsRepository;
+    private final CardsRepository cardsRepository;
 
     /**
      * @param mobileNumber - Mobile Number of the Customer

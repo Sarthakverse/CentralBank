@@ -1,7 +1,7 @@
-# version: "3.9" ....if we use this then mem_limit will not work because now docker says "mem limit is only for production level not self learning"
+version: "3.9"
 services:
   rabbit:
-    image: "rabbitmq:3.13-management"
+    image: rabbitmq:3.13-management
     container_name: rabbit
     ports:
       - "5672:5672"
@@ -17,7 +17,7 @@ services:
       service: network-deploy-service
 
   configserver:
-    image: "eazybytes/configserver:s6"
+    image: centralbank/config-microservice:s1
     container_name: configserver-ms
     ports:
       - "8071:8071"
@@ -34,62 +34,64 @@ services:
       file: common-config.yml
       service: microservice-base-config
 
+  eurekaserver:
+    image: "eazybytes/eureka-microservice:s1"
+    container_name: eurekaserver-ms
+    ports:
+      - "8072:8072"
+    depends_on:
+      configserver:
+        condition: service_healthy
+    healthcheck:
+      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: microservice-configserver-config
+    environment:
+      SPRING_APPLICATION_NAME: eurekaserver
+
   accounts:
-    image: "centralbank/accounts-microservice:s1"
+    image: centralbank/accounts-microservice:s1
     container_name: accounts-ms
     ports:
       - "8080:8080"
-    #    deploy:
-    #      resources:
-    #        limits:
-    #          memory: 700m ....instead we will use mem_limit because deploy is only for swarm mode and we are not using swarm mode
-    # mem_limit: 700m
     depends_on:
       configserver:
         condition: service_healthy
     environment:
-      SPRING_APPLICATION_NAME: "accounts"
-      SPRING_PROFILES_ACTIVE: "docker"
+      SPRING_APPLICATION_NAME: accounts
     extends:
       file: common-config.yml
       service: microservice-configserver-config
 
   loans:
-    image: "centralbank/loans-microservice:s1"
+    image: centralbank/loans-microservice:s1
     container_name: loans-ms
     ports:
       - "8090:8090"
-    #    deploy:
-    #      resources:
-    #        limits:
-    #          memory: 700m
-    # mem_limit: 700m
     depends_on:
       configserver:
         condition: service_healthy
     environment:
-      SPRING_APPLICATION_NAME: "loans"
-      SPRING_PROFILES_ACTIVE: "docker"
+      SPRING_APPLICATION_NAME: loans
     extends:
       file: common-config.yml
       service: microservice-configserver-config
 
   cards:
-    image: "centralbank/cards-microservice:s1"
+    image: centralbank/cards-microservice:s1
     container_name: cards-ms
     ports:
       - "9000:9000"
-    #    deploy:
-    #      resources:
-    #        limits:
-    #          memory: 700m
-    #    mem_limit: 700m
     depends_on:
       configserver:
         condition: service_healthy
     environment:
-      SPRING_APPLICATION_NAME: "cards"
-      SPRING_PROFILES_ACTIVE: "docker"
+      SPRING_APPLICATION_NAME: cards
     extends:
       file: common-config.yml
       service: microservice-configserver-config

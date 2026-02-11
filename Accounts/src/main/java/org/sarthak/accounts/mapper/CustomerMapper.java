@@ -1,5 +1,6 @@
 package org.sarthak.accounts.mapper;
 
+import org.sarthak.accounts.dto.CustomerDetailsDto;
 import org.sarthak.accounts.dto.CustomerDto;
 import org.sarthak.accounts.entity.Customer;
 
@@ -16,5 +17,12 @@ public class CustomerMapper {
         customer.setEmail(customerDto.getEmail());
         customer.setMobileNumber(customerDto.getMobileNumber());
         return customer;
+    }
+
+    public static CustomerDetailsDto mapToCustomerDetailsDto(Customer customer, CustomerDetailsDto customerDetailsDto) {
+        customerDetailsDto.setName(customer.getName());
+        customerDetailsDto.setEmail(customer.getEmail());
+        customerDetailsDto.setMobileNumber(customer.getMobileNumber());
+        return customerDetailsDto;
     }
 }

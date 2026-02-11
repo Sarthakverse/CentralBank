@@ -9,6 +9,7 @@ import com.sarthak.Loan.mapper.LoansMapper;
 import com.sarthak.Loan.repository.LoansRepository;
 import com.sarthak.Loan.service.ILoansService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +17,10 @@ import java.util.Optional;
 import java.util.Random;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class LoansServiceImpl implements ILoansService {
 
-    @Autowired
-    private LoansRepository loansRepository;
+    private final LoansRepository loansRepository;
 
     /**
      * @param mobileNumber - Mobile Number of the Customer

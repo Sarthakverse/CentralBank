@@ -1,6 +1,7 @@
 package org.sarthak.accounts.service.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.sarthak.accounts.constants.AccountsConstants;
 import org.sarthak.accounts.dto.AccountsDto;
 import org.sarthak.accounts.dto.CustomerDto;
@@ -19,11 +20,11 @@ import java.util.Optional;
 import java.util.Random;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AccountsServiceImpl  implements IAccountsService {
 
-    private AccountsRepository accountsRepository;
-    private CustomerRepository customerRepository;
+    private final AccountsRepository accountsRepository;
+    private final CustomerRepository customerRepository;
 
     /**
      * @param customerDto - CustomerDto Object
