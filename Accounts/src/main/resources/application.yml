@@ -28,6 +28,10 @@ spring:
       port: 5672
       username: guest
       password: guest
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
 
 management:
   endpoints:
@@ -65,3 +69,41 @@ logging:
     org.springframework.cloud.openfeign: DEBUG
     com.netflix.discovery: INFO
     org.springframework.web: INFO
+
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      cards:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 2
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+
+      loans:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 2
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+
+  retry:
+    instances:
+      cards:
+        maxAttempts: 3
+        waitDuration: 500ms
+
+      loans:
+        maxAttempts: 3
+        waitDuration: 500ms
+
+  ratelimiter:
+    instances:
+      cards:
+        timeoutDuration: 1s
+        limitRefreshPeriod: 5s
+        limitForPeriod: 1
+
+      loans:
+        timeoutDuration: 1s
+        limitRefreshPeriod: 5s
+        limitForPeriod: 1

@@ -18,24 +18,52 @@ public class GatewayserverApplication {
 	@Bean
 	public RouteLocator centralBankRouteConfig(RouteLocatorBuilder routeLocatorBuilder) {
 		return routeLocatorBuilder.routes()
-				.route(p -> p
+				// ACCOUNTS
+				.route("accounts-route", r -> r
 						.path("/centralbank/accounts/**")
-						.filters( f -> f.rewritePath("/centralbank/accounts/(?<segment>.*)","/${segment}")
+						.filters(f -> f
+								.rewritePath("/centralbank/accounts/(?<segment>.*)", "/${segment}")
 								.addResponseHeader("X-Response-Time",
-										String.valueOf(System.currentTimeMillis())))
-						.uri("lb://ACCOUNTS"))
-				.route(p -> p
+										String.valueOf(System.currentTimeMillis()))
+								.circuitBreaker(config -> config
+										.setName("accountsCircuitBreaker")
+										.setFallbackUri("forward:/fallback/accounts")
+								)
+						)
+						.uri("lb://ACCOUNTS")
+				)
+
+				//  LOANS
+				.route("loans-route", r -> r
 						.path("/centralbank/loans/**")
-						.filters( f -> f.rewritePath("/centralbank/loans/(?<segment>.*)","/${segment}")
+						.filters(f -> f
+								.rewritePath("/centralbank/loans/(?<segment>.*)", "/${segment}")
 								.addResponseHeader("X-Response-Time",
-										String.valueOf(System.currentTimeMillis())))
-						.uri("lb://LOANS"))
-				.route(p -> p
+										String.valueOf(System.currentTimeMillis()))
+								.circuitBreaker(config -> config
+										.setName("loansCircuitBreaker")
+										.setFallbackUri("forward:/fallback/loans")
+								)
+						)
+						.uri("lb://LOANS")
+				)
+
+				// CARDS
+				.route("cards-route", r -> r
 						.path("/centralbank/cards/**")
-						.filters( f -> f.rewritePath("/centralbank/cards/(?<segment>.*)","/${segment}")
+						.filters(f -> f
+								.rewritePath("/centralbank/cards/(?<segment>.*)", "/${segment}")
 								.addResponseHeader("X-Response-Time",
-										String.valueOf(System.currentTimeMillis())))
-						.uri("lb://CARDS")).build();
+										String.valueOf(System.currentTimeMillis()))
+								.circuitBreaker(config -> config
+										.setName("cardsCircuitBreaker")
+										.setFallbackUri("forward:/fallback/cards")
+								)
+						)
+						.uri("lb://CARDS")
+				)
+
+				.build();
 
 
 	}

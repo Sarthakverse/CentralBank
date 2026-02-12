@@ -2,8 +2,10 @@
   <dictionary name="project">
     <words>
       <w>centralbank</w>
+      <w>circuitbreaker</w>
       <w>eurekaserver</w>
       <w>gatewayserver</w>
+      <w>ratelimiter</w>
     </words>
   </dictionary>
 </component>
