@@ -5,6 +5,12 @@
       <w>circuitbreaker</w>
       <w>eurekaserver</w>
       <w>gatewayserver</w>
+      <w>grafana</w>
+      <w>inmemory</w>
+      <w>kvstore</w>
+      <w>loki</w>
+      <w>otlp</w>
+      <w>prometheus</w>
       <w>ratelimiter</w>
     </words>
   </dictionary>

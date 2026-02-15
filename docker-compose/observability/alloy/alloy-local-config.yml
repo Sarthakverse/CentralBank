@@ -1,0 +1,42 @@
+  discovery.docker "containers" {
+    host             = "unix:///var/run/docker.sock"
+    refresh_interval = "5s"
+  }
+    
+    discovery.relabel "containers" {
+    targets = discovery.docker.containers.targets
+    
+    rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+    }
+  }
+    
+    loki.source.docker "containers" {
+    host             = "unix:///var/run/docker.sock"
+    targets          = discovery.relabel.containers.output
+    forward_to       = [loki.process.add_trace_labels.receiver]
+    refresh_interval = "5s"
+  }
+  
+  loki.process "add_trace_labels" {
+  forward_to = [loki.write.default.receiver]
+  
+  stage.regex {
+  expression = ".*\\[(?P<traceId>[a-f0-9]+),(?P<spanId>[a-f0-9]+)\\].*"
+  }
+  
+  stage.labels {
+  values = {
+  traceId = "traceId",
+  spanId  = "spanId",
+  }
+  }
+  }
+    
+    loki.write "default" {
+    endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+    }
+  }

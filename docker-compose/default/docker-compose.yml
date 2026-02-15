@@ -25,7 +25,7 @@ services:
       rabbit:
         condition: service_healthy
     healthcheck:
-      test: curl --fail --silent localhost:8071/actuator/health/readiness | grep UP || exit 1
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8071/actuator/health | grep UP || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -43,11 +43,11 @@ services:
       configserver:
         condition: service_healthy
     healthcheck:
-      test: "curl --fail --silent localhost:8072/actuator/health/readiness | grep UP || exit 1"
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8072/actuator/health | grep UP || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 10s
+      start_period: 20s
     extends:
       file: common-config.yml
       service: microservice-configserver-config
@@ -66,6 +66,12 @@ services:
         condition: service_healthy
       cards:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8081/actuator/health | grep UP || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
     environment:
       SPRING_APPLICATION_NAME: gatewayserver
     extends:
@@ -80,6 +86,12 @@ services:
     depends_on:
       configserver:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep UP || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
     environment:
         SPRING_APPLICATION_NAME: accounts
     extends:
@@ -94,6 +106,12 @@ services:
     depends_on:
       configserver:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8090/actuator/health | grep UP || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
     environment:
         SPRING_APPLICATION_NAME: loans
     extends:
@@ -108,12 +126,77 @@ services:
     depends_on:
       configserver:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:9000/actuator/health | grep UP || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
     environment:
         SPRING_APPLICATION_NAME: cards
     extends:
         file: common-config.yml
         service: microservice-configserver-config
 
+  # -------------------------
+  # OBSERVABILITY STACK
+  # -------------------------
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ../observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - centralbank
+
+  loki:
+    image: grafana/loki:2.9.8
+    container_name: loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ../observability/loki/loki-config.yml:/etc/loki/local-config.yaml
+    networks:
+      - centralbank
+
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    ports:
+      - "3101:3100"
+      - "4318:4318"
+      - "4317:4317"
+    command: ["-config.file=/etc/tempo/tempo.yml"]
+    volumes:
+      - ../observability/tempo/tempo.yml:/etc/tempo/tempo.yml
+    networks:
+      - centralbank
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../observability/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+    networks:
+      - centralbank
+
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
+    volumes:
+      - ../observability/alloy/alloy-local-config.yml:/etc/alloy/config.alloy
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: run /etc/alloy/config.alloy
+    networks:
+      - centralbank
+
 networks:
   centralbank:
-    driver: "bridge"
+    driver: bridge

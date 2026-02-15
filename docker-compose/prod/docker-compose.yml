@@ -17,7 +17,7 @@ services:
       service: network-deploy-service
 
   configserver:
-    image: centralbank/config-microservice:s1
+    image: centralbank/configserver-microservice:s1
     container_name: configserver-ms
     ports:
       - "8071:8071"
@@ -35,7 +35,7 @@ services:
       service: microservice-base-config
 
   eurekaserver:
-    image: "eazybytes/eureka-microservice:s1"
+    image: centralbank/eureka-microservice:s1
     container_name: eurekaserver-ms
     ports:
       - "8072:8072"

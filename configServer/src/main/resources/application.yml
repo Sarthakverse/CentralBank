@@ -4,24 +4,18 @@ server:
 spring:
   application:
     name: configserver
+
   profiles:
     active: native
-#   active: git
+
   cloud:
     config:
       server:
         native:
-         search-locations: "classpath:/config"
-#        search-locations: "local file system path"
-#        git:
-#          uri: "github repo url"
-#          default-label: main
-#          timeout: 5
-#          clone-on-start: true
-#          force-pull: true
+          search-locations: "classpath:/config"
+
   rabbitmq:
-    host: localhost
-#   host: rabbit
+    host: rabbit
     port: 5672
     username: guest
     password: guest

@@ -21,13 +21,14 @@ spring:
     show-sql: true
 
   config:
-    import: "optional:configserver:http://localhost:8071/"
+    import: "optional:configserver:http://configserver:8071/"
+
   rabbitmq:
-      host: localhost
-#      host: rabbit
-      port: 5672
-      username: guest
-      password: guest
+    host: rabbit
+    port: 5672
+    username: guest
+    password: guest
+
   cloud:
     openfeign:
       circuitbreaker:
@@ -41,12 +42,23 @@ management:
   endpoint:
     shutdown:
       access: unrestricted
+    prometheus:
+      access: unrestricted
     health:
       probes:
         enabled: true
   info:
     env:
       enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: http://tempo:4318/v1/traces
 
 eureka:
   instance:
@@ -55,7 +67,7 @@ eureka:
     fetchRegistry: true
     registerWithEureka: true
     serviceUrl:
-     defaultZone: http://localhost:8072/eureka/
+      defaultZone: http://eurekaserver:8072/eureka/
 
 info:
   app:
@@ -63,47 +75,10 @@ info:
     description: "Central Bank Accounts Application"
     version: "1.0.0"
 
-
 logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level ${spring.application.name} - [%X{traceId:-},%X{spanId:-}] %logger{36} : %msg%n"
   level:
     org.springframework.cloud.openfeign: DEBUG
     com.netflix.discovery: INFO
     org.springframework.web: INFO
-
-
-resilience4j:
-  circuitbreaker:
-    instances:
-      cards:
-        slidingWindowSize: 10
-        permittedNumberOfCallsInHalfOpenState: 2
-        failureRateThreshold: 50
-        waitDurationInOpenState: 10s
-
-      loans:
-        slidingWindowSize: 10
-        permittedNumberOfCallsInHalfOpenState: 2
-        failureRateThreshold: 50
-        waitDurationInOpenState: 10s
-
-  retry:
-    instances:
-      cards:
-        maxAttempts: 3
-        waitDuration: 500ms
-
-      loans:
-        maxAttempts: 3
-        waitDuration: 500ms
-
-  ratelimiter:
-    instances:
-      cards:
-        timeoutDuration: 1s
-        limitRefreshPeriod: 5s
-        limitForPeriod: 1
-
-      loans:
-        timeoutDuration: 1s
-        limitRefreshPeriod: 5s
-        limitForPeriod: 1

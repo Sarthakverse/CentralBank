@@ -6,38 +6,14 @@ spring:
     name: gatewayserver
 
   config:
-    import: "optional:configserver:http://localhost:8071/"
+    import: "optional:configserver:http://configserver:8071/"
 
   cloud:
     gateway:
       discovery:
         locator:
-#         enabled: true  .....when true, routes are automatically created for services registered in Eureka
           enabled: false
           lower-case-service-id: true
-
-#   we can define routes here if we don't want to use discovery locator & use custom routes instead using RouteLocatorBuilder
-#      routes:
-#        - id: accounts-route
-#          uri: lb://ACCOUNTS
-#          predicates:
-#            - Path=/accounts/**
-#          filters:
-#            - StripPrefix=1
-#
-#        - id: cards-route
-#          uri: lb://CARDS
-#          predicates:
-#            - Path=/cards/**
-#          filters:
-#            - StripPrefix=1
-#
-#        - id: loans-route
-#          uri: lb://LOANS
-#          predicates:
-#            - Path=/loans/**
-#          filters:
-#            - StripPrefix=1
 
 management:
   endpoints:
@@ -47,10 +23,23 @@ management:
   endpoint:
     gateway:
       access: unrestricted
+    prometheus:
+      access: unrestricted
   info:
     env:
       enabled: true
-
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: http://tempo:4318/v1/traces
+  observations:
+    key-values:
+      application: ${spring.application.name}
 info:
   app:
     name: "gatewayserver"
@@ -58,8 +47,9 @@ info:
     version: "1.0.0"
 
 logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level ${spring.application.name} - [%X{traceId:-},%X{spanId:-}] %logger{36} : %msg%n"
   level:
     org.springframework.cloud.gateway: DEBUG
     org.springframework.cloud.loadbalancer: DEBUG
     feign: DEBUG
-
