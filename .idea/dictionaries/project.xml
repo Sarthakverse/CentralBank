@@ -6,12 +6,15 @@
       <w>eurekaserver</w>
       <w>gatewayserver</w>
       <w>grafana</w>
+      <w>grpc</w>
       <w>inmemory</w>
       <w>kvstore</w>
       <w>loki</w>
       <w>otlp</w>
       <w>prometheus</w>
       <w>ratelimiter</w>
+      <w>resourceserver</w>
+      <w>testdb</w>
     </words>
   </dictionary>
 </component>
