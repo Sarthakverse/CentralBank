@@ -8,6 +8,7 @@
       <w>grafana</w>
       <w>grpc</w>
       <w>inmemory</w>
+      <w>kafka</w>
       <w>kvstore</w>
       <w>loki</w>
       <w>otlp</w>

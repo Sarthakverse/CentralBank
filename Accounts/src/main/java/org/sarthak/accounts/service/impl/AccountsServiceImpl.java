@@ -1,12 +1,13 @@
 package org.sarthak.accounts.service.impl;
 
-import lombok.AllArgsConstructor;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.sarthak.accounts.constants.AccountsConstants;
 import org.sarthak.accounts.dto.AccountsDto;
 import org.sarthak.accounts.dto.CustomerDto;
 import org.sarthak.accounts.entity.Accounts;
 import org.sarthak.accounts.entity.Customer;
+import org.sarthak.accounts.dto.event.AccountCreateEvent;
 import org.sarthak.accounts.exception.CustomerAlreadyExistsException;
 import org.sarthak.accounts.exception.ResourceNotFoundException;
 import org.sarthak.accounts.mapper.AccountsMapper;
@@ -14,6 +15,7 @@ import org.sarthak.accounts.mapper.CustomerMapper;
 import org.sarthak.accounts.repository.AccountsRepository;
 import org.sarthak.accounts.repository.CustomerRepository;
 import org.sarthak.accounts.service.IAccountsService;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -25,11 +27,13 @@ public class AccountsServiceImpl  implements IAccountsService {
 
     private final AccountsRepository accountsRepository;
     private final CustomerRepository customerRepository;
+    private final KafkaTemplate<String, AccountCreateEvent> kafkaTemplate;
 
     /**
      * @param customerDto - CustomerDto Object
      */
     @Override
+    @Transactional
     public void createAccount(CustomerDto customerDto) {
         Customer customer = CustomerMapper.mapToCustomer(customerDto, new Customer());
         Optional<Customer> optionalCustomer = customerRepository.findByMobileNumber(customerDto.getMobileNumber());
@@ -38,7 +42,20 @@ public class AccountsServiceImpl  implements IAccountsService {
                     +customerDto.getMobileNumber());
         }
         Customer savedCustomer = customerRepository.save(customer);
-        accountsRepository.save(createNewAccount(savedCustomer));
+        Accounts newAccount = createNewAccount(savedCustomer);
+
+        Accounts savedAccount = accountsRepository.save(newAccount);
+        AccountCreateEvent event = new AccountCreateEvent(
+                savedAccount.getAccountNumber(),
+                savedAccount.getAccountType(),
+                savedCustomer.getName(),
+                savedCustomer.getMobileNumber(),
+                savedCustomer.getEmail()
+        );
+
+        kafkaTemplate.send("account-created-topic", event);
+
+
     }
 
     /**
