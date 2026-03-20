@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: configserver
+  labels:
+    app: configserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: configserver
+  template:
+    metadata:
+      labels:
+        app: configserver
+    spec:
+      containers:
+        - name: configserver
+          image: centralbank/configserver-microservice:s1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8071
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: configserver
+spec:
+  selector:
+    app: configserver
+  ports:
+    - protocol: TCP
+      port: 8071
+      targetPort: 8071
+  type: ClusterIP

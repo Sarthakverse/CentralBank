@@ -18,7 +18,7 @@ public class RequestTraceFilter implements GlobalFilter {
     private static final Logger logger = LoggerFactory.getLogger(RequestTraceFilter.class);
 
     @Autowired
-    FilterUtility filterUtility;
+    private FilterUtility filterUtility;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
