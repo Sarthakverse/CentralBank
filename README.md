@@ -1,10 +1,10 @@
 <!-- README: SarthakVerse CentralBank Microservices Platform -->
 
 <div align="center">
-  <h1>🏦 SarthakVerse — CentralBank Microservices Platform</h1>
+  <h1>🏦CentralBank Microservices Platform</h1>
   <p>
     <strong>Enterprise-Grade Distributed Banking Architecture</strong><br>
-    Built using Spring Boot • Spring Cloud • Eureka • Gateway • Docker
+    Built using Spring Boot • Spring Cloud • Eureka • Gateway • Docker • Observability Stack
   </p>
   <hr width="60%">
 </div>
@@ -13,204 +13,250 @@
 
 ## ✨ Overview
 
-**SarthakVerse CentralBank** is a cloud-native, distributed microservices banking platform built using modern Spring Boot and Spring Cloud technologies.
+**CentralBank** is a production-style, cloud-native distributed banking platform built using Spring Boot and Spring Cloud.
 
-The system demonstrates production-grade architectural patterns including:
+The system simulates a real-world banking ecosystem using:
 
-- API Gateway Pattern  
-- Service Discovery (Eureka)  
-- Centralized Configuration (Config Server)  
-- Inter-Service Communication (Feign Clients)  
-- Distributed Request Tracing (Correlation ID)  
-- Dockerized Multi-Environment Deployment  
-- Profile-Based Configuration (default / qa / prod)
+- Event-Driven Architecture (Kafka)
+- API Gateway Pattern
+- Service Discovery (Eureka)
+- Centralized Configuration (Config Server)
+- OAuth2 Security (Keycloak + JWT)
+- Distributed Tracing (OpenTelemetry + Tempo)
+- Metrics Monitoring (Prometheus)
+- Centralized Logging (Loki)
+- Dockerized Multi-Service Deployment
 
-This project simulates a simplified banking ecosystem with independent domain-driven services.
+This project demonstrates enterprise-grade system design principles, not just CRUD microservices.
 
 ---
 
-## 🏗 Architecture Overview
-<img width="768" height="828" alt="Screenshot 2026-02-12 011149" src="https://github.com/user-attachments/assets/edffc420-3f4e-4a20-af51-1959a6a148da" />
+## 🏗System Architecture
+<img width="1761" height="863" alt="Screenshot 2026-02-16 214022" src="https://github.com/user-attachments/assets/fa526bc4-8643-4f69-bcf4-572f95957c37" />
+This platform follows a layered cloud-native architecture:
 
-The system consists of the following microservices:
+The system is organized into layered architectural components:
+
+### 🔹 Client Layer
+- External clients interact only with the API Gateway.
+
+### 🔹 Platform Layer
+- Config Server
+- Eureka Server
+- Kafka
+- RabbitMQ
+
+### 🔹 Business Services Layer
+- Accounts Service
+- Cards Service
+- Loans Service
+
+### 🔹 Observability Layer
+- Prometheus
+- Loki
+- Tempo
+- Grafana
+- Alloy
+
+---
+
+## 🧠 C4 Container Architecture
+
+<img width="1385" height="555" alt="image" src="https://github.com/user-attachments/assets/75c52ff3-fcda-446f-a003-d85029dcc3ac" />
+
+
+This diagram illustrates system boundaries, container responsibilities, and inter-service relationships.
+
+---
+
+## ⚙ Microservices Overview
 
 | Service | Port | Responsibility |
 |----------|------|---------------|
 | Config Server | 8071 | Centralized configuration management |
 | Eureka Server | 8072 | Service registry & discovery |
-| Gateway Server | 8081 | API routing, filters, tracing |
+| Gateway Server | 8081 | API routing, security enforcement |
 | Accounts Service | 8080 | Customer & Account domain |
 | Loans Service | 8090 | Loan domain |
 | Cards Service | 9000 | Card domain |
-| RabbitMQ | 5672 | Messaging infrastructure |
+| Kafka | 9092 | Event streaming |
+| Keycloak | 8180 | OAuth2 Identity Provider |
 
 ---
 
-## 🧩 Microservices Breakdown
-**End-to-End Microservices Request Flow Sequence Diagram**
-<img width="1153" height="614" alt="Screenshot 2026-02-12 011248" src="https://github.com/user-attachments/assets/b1e4b905-d33f-4f40-b0a5-7c6ea5f0f3bb" />
+## 🏦 Accounts Service (Core Domain)
+
+<img width="1403" height="442" alt="image" src="https://github.com/user-attachments/assets/daac1232-2d27-4ef2-b447-8c972216e9d8" />
 
 
-### 🏦 Accounts Service
 Handles:
+
 - Customer creation
 - Account creation
-- Fetching customer composite details
+- Publishing `AccountCreateEvent`
+- Composite customer details aggregation
 - Feign calls to Loans & Cards
 - DTO mapping
 - Exception handling
-- Auditing
-- Schema initialization
+- Transaction management
+- Audit support
 
 Implements:
-- `CustomerController`
-- `AccountsController`
-- `CustomerServiceImpl`
-- Feign clients for Loans & Cards
+- AccountsController
+- CustomerController
+- AccountsServiceImpl
+- KafkaTemplate publisher
+- Feign clients
+
+Pattern Used:
+Layered Architecture + Event Publisher + API Composition
 
 ---
 
-### 💳 Cards Service
+## 💳 Cards Service
+
 Handles:
-- Card creation
-- Update
-- Delete
-- Fetch by mobile number
-- Profile-based configuration
-- Validation & exception handling
+
+- Card creation (event-driven)
+- Fetch / Update / Delete operations
+- Kafka consumer (`account-created-topic`)
+- Domain validation
+- Independent persistence
+
+Implements:
+- CardsController
+- CardsServiceImpl
+- AccountEventListener
 
 ---
 
-### 💰 Loans Service
+## 💰 Loans Service
+
 Handles:
-- Loan creation
-- Update
-- Delete
-- Fetch by mobile number
-- Contact info configuration
-- Audit logging
+
+- Loan creation (event-driven)
+- Fetch / Update / Delete operations
+- Kafka consumer (`account-created-topic`)
+- Domain validation
+- Independent persistence
+
+Implements:
+- LoansController
+- LoansServiceImpl
+- AccountEventListener
 
 ---
 
-### ⚙ Config Server
-**Centralized Configuration Management Architecture Diagram**
-<img width="1111" height="362" alt="Screenshot 2026-02-12 011319" src="https://github.com/user-attachments/assets/47cd4ca6-7fbf-45ba-8391-baf7a1606e40" />
+## 🔁 Event-Driven Architecture
 
-Centralized configuration source for:
+<img width="1511" height="578" alt="image" src="https://github.com/user-attachments/assets/0c468e65-d1f3-4a75-978d-b699bf6cc732" />
 
-- accounts.yml
-- accounts-qa.yml
-- accounts-prod.yml
-- loans.yml
-- cards.yml
-- gatewayserver.yml
-- eurekaserver.yml
 
-Supports profile-based segregation.
+When a new account is created:
+
+1. Accounts Service saves Customer + Account.
+2. Publishes `AccountCreateEvent`.
+3. Kafka distributes event to:
+   - Cards Service (creates credit card)
+   - Loans Service (creates home loan)
+
+Kafka consumer groups:
+- `cards-group`
+- `loans-group`
+
+Pattern:
+Event-Driven Microservices (Fan-out)
 
 ---
 
-### 🌐 Eureka Server
-**Service Registration & Discovery Architecture Diagram**
-<img width="1229" height="502" alt="Screenshot 2026-02-12 011306" src="https://github.com/user-attachments/assets/20f36307-3d10-480b-9961-fcb2dd390d42" />
+## 🌐 Synchronous Aggregation Flow
+<img width="1096" height="655" alt="image" src="https://github.com/user-attachments/assets/f97e5598-9002-4a3a-8d05-ac6383df8e69" />
+
+
+
+Accounts Service acts as an API Composition layer.
+
+Flow:
+Client → Gateway → Accounts → (Feign) → Cards & Loans → Aggregated Response
+
+Patterns Used:
+- API Composition
+- Client-side Load Balancing
+- Service Discovery via Eureka
+
+---
+
+## 🔐 Security Architecture
+<img width="695" height="570" alt="image" src="https://github.com/user-attachments/assets/77d05c07-7fcc-4d0a-ac6c-bf648b2043b6" />
+
+
+Security Model:
+
+- OAuth2 Authorization Server → Keycloak
+- Gateway acts as Resource Server
+- JWT validation via issuer-uri
+- Stateless authentication
+- Zero-trust internal communication
+
+Only Gateway is exposed externally.
+
+---
+
+## 📊 Observability Architecture
+
+<img width="1069" height="490" alt="image" src="https://github.com/user-attachments/assets/01cf7984-03c5-4ab4-ad15-a39e49f8fe26" />
+
+
+Implements the Three Pillars of Observability:
+
+### Metrics
+Micrometer → Prometheus → Grafana
+
+### Logs
+Application Logs → Alloy → Loki → Grafana
+
+### Traces
+OpenTelemetry → Tempo → Grafana
 
 Provides:
-- Service registration
-- Service discovery
-- Load-balanced communication
-- Health monitoring
-
-All microservices register themselves here.
+- Distributed tracing
+- Performance monitoring
+- Centralized log aggregation
+- Production diagnostics capability
 
 ---
 
-### 🚪 Gateway Server
+## 🐳 Docker Deployment Architecture
 
-Acts as system entry point.
-
-Features:
-- Load-balanced routing using `lb://`
-- Path rewriting
-- Global request filter
-- Global response filter
-- Correlation ID propagation
-- Response header injection
-- Dynamic route configuration using `RouteLocatorBuilder`
-
-Example routing:
-- `/centralbank/accounts/**`
-- `/centralbank/loans/**`
-- `/centralbank/cards/**`
+<img width="980" height="648" alt="image" src="https://github.com/user-attachments/assets/f7cbeac2-7f50-426c-bf40-60c42ee4fa72" />
 
 
-Implements:
-- RequestTraceFilter
-- ResponseTraceFilter
-- FilterUtility
-- Custom route configuration
+Deployment includes:
+
+- Containerized microservices
+- Central bridge network
+- Health checks & dependency sequencing
+- Kafka cluster (Zookeeper + Broker)
+- Observability stack
+- Profile-based environment segregation (default / qa / prod)
 
 ---
 
-## 🔁 Inter-Service Communication
+## 🚀 Running the System (Docker)
 
-Accounts service uses:
-
-- `CardsFeignClient`
-- `LoansFeignClient`
-
-Communication flow:
-
-Client → Gateway → Accounts → (Feign) → Loans & Cards
-
----
-
-## 🔍 Distributed Request Tracing
-**Distributed co-relation id diagram**
-<img width="1134" height="593" alt="image" src="https://github.com/user-attachments/assets/856ddd2b-6f34-4e80-bd8e-a7e3ade479b0" />
-
-Gateway generates a unique: **centralbank-correlation-id**
-Flow:
-1. If request already contains correlation ID → reused
-2. Else → generated at Gateway
-3. Propagated to downstream services
-4. Returned in response headers
-
-Ensures traceability across services.
-
----
-## 🐳 Docker Deployment
-
-Project includes multi-environment docker setup:
-```
-docker-compose/
-├── default/
-├── qa/
-└── prod/
-```
+Navigate to: docker-compose/default
+Start services: docker compose up -d
 
 
-Each environment contains:
-- docker-compose.yml
-- common-config.yml
+Startup Order:
 
-Supports:
-- Profile activation
-- Network isolation
-- Service dependency sequencing
-- Environment variable injection
-
----
-
-## 🚀 How To Run (Docker)
-
-Navigate to: **docker-compose/default**
-
-Then: **System startup order**
-1. RabbitMQ
-2. Config Server
-3. Eureka Server
-4. Accounts / Loans / Cards
-5. Gateway
+1. RabbitMQ  
+2. Config Server  
+3. Eureka Server  
+4. Kafka + Zookeeper  
+5. Business Services  
+6. Gateway  
+7. Observability Stack  
 
 ---
 
@@ -221,12 +267,13 @@ Then: **System startup order**
 | Gateway | http://localhost:8081 |
 | Eureka Dashboard | http://localhost:8072 |
 | Config Server | http://localhost:8071 |
-| Accounts API | http://localhost:8081/centralbank/accounts/... |
+| Grafana | http://localhost:3000 |
+| Keycloak | http://localhost:8180 |
 
 ---
 
 ## 📂 Project Structure
-```
+
 sarthakverse-centralbank/
 ├── Accounts/
 ├── Cards/
@@ -235,52 +282,47 @@ sarthakverse-centralbank/
 ├── eurekaServer/
 ├── gatewayserver/
 └── docker-compose/
-```
 
 
+Each microservice follows clean layered architecture:
 
-Each service follows clean layered architecture:
-
-- controller
-- service
-- repository
-- dto
-- entity
-- mapper
-- exception
-- config
-- audit
+- controller  
+- service  
+- repository  
+- dto  
+- entity  
+- mapper  
+- exception  
+- config  
+- audit  
 
 ---
 
-## 🧠 Architectural Concepts Implemented
+## 🧠 Architectural Patterns Implemented
 
-- Microservices Architecture
-- Service Registry Pattern
-- API Gateway Pattern
-- Centralized Configuration Pattern
-- Circuit-ready design
-- DTO Mapping Layer
-- Exception Handling Strategy
-- Distributed Tracing (Manual)
-- Dockerized Environment Strategy
-- Environment-based Config Segregation
+- Microservices Architecture  
+- Event-Driven Architecture  
+- API Gateway Pattern  
+- Service Registry Pattern  
+- Database per Service Pattern  
+- Centralized Configuration Pattern  
+- OAuth2 Security Pattern  
+- Distributed Tracing Pattern  
+- Observability Pattern  
+- Containerized Deployment Strategy  
 
 ---
 
-## 🎯 Future Enhancements
+## 🎯 Production-Grade Capabilities
 
-Planned roadmap:
-
-- JWT Authentication at Gateway
-- Resilience4j Circuit Breaker
-- Rate Limiting
-- Distributed Tracing with Zipkin
-- Centralized Logging (ELK Stack)
-- Prometheus & Grafana Monitoring
-- Kubernetes Deployment
-- CI/CD Integration
-- API Documentation Consolidation
+✔ Stateless services  
+✔ Independent scaling  
+✔ Fault isolation  
+✔ Event-based decoupling  
+✔ Full telemetry pipeline  
+✔ Health probes  
+✔ Profile-based configuration  
+✔ Dockerized deployment  
 
 ---
 
@@ -288,12 +330,10 @@ Planned roadmap:
 
 **Sarthak Rastogi**
 
-Built as an enterprise-grade distributed system learning project to simulate real-world banking microservices architecture.
+Designed and engineered as a production-style distributed banking architecture to demonstrate advanced system design, cloud-native architecture, and enterprise microservices patterns.
 
 ---
 
 <div align="center">
-  <strong>Engineered with precision. Designed for scale.</strong>
+  <strong>Engineered with precision. Designed for scale. Built for production.</strong>
 </div>
-
-
